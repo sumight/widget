@@ -12,7 +12,7 @@ function Widget() {
 }
 
 Widget.prototype.defaultOptions = {
-
+    
 };
 
 /**
