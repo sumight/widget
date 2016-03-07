@@ -1,0 +1,78 @@
+var Widget = require('../../widget.js');
+var util = require('@plug/util');
+
+var SomeWidget = function() {
+
+}
+
+util.inherits(SomeWidget, Widget);
+
+SomeWidget.prototype.defaultOptions = {
+    name: '',
+    value: ''
+};
+
+SomeWidget.prototype.init = function(options) {
+    var self = this;
+    self.initConfig(options);
+    self.render(true);
+};
+
+SomeWidget.prototype.template = function() {
+    var self = this;
+    return '<span class="btn">' + self.name + '   ' + self.value + '</span>';
+};
+
+// 使用控件
+
+/**
+ * 直接单例初始化
+ */
+// var w = new SomeWidget();
+// w.init({
+//     container:'.js-hook',
+//     name:'this is name',
+//     value:'value is here'
+// });
+
+/**
+ * 手动注册为 jquery plug
+ */
+// $.fn.SomeWidget = function(options) {
+//     if (options === undefined) {
+//         // 如果存在句柄，则返回
+//         return $(this).data('handle');
+//     }
+//     // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
+//     return this.each(function() {
+//         var $this = $(this);
+
+//         // 实例化控件
+//         var someWidget = new SomeWidget();
+//         // 初始化控件
+//         options.container = $this;
+//         someWidget.init(options);
+//         // 保存句柄
+//         $this.data('handle', someWidget);
+//     });
+// }
+
+/**
+ * 使用提供的方法注册为 jquery 插件
+ */
+Widget.registerJQeuryPlug('bbb', SomeWidget);
+
+$('.js-hook').bbb({
+    container:'.js-hook',
+    name:'this is name',
+    value:'value is here'
+});
+
+/**
+ * 获取控件的句柄
+ */
+console.log($('.js-hook.x1').bbb());
+/**
+ * 获取控件的另一个句柄
+ */
+console.log($('.js-hook.x2').bbb());
