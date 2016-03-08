@@ -17,6 +17,10 @@ SomeWidget.prototype.init = function(options) {
     var self = this;
     self.initConfig(options);
     self.render(true);
+
+    setTimeout(function(){
+        $(self.container).trigger('bobe', self.name);
+    }, 1000);
 };
 
 SomeWidget.prototype.template = function() {
@@ -63,11 +67,25 @@ SomeWidget.prototype.template = function() {
  */
 Widget.registerJQeuryPlug('bbb', SomeWidget);
 
+/**
+ * 初始化控件
+ */
 $('.js-hook').bbb({
     container:'.js-hook',
     name:'this is name',
     value:'value is here'
 });
+
+/**
+ * 监听事件
+ */
+$('.js-hook').bbb().on('bobe', function(e, arg1){
+    alert('爆炸了 '+arg1);
+})
+
+$('.js-hook.x2').bbb().on('bobe', function(e, arg1){
+    alert('爆炸了 '+arg1);
+})
 
 /**
  * 获取控件的句柄
@@ -1112,11 +1130,22 @@ Widget.prototype.render = function(replace) {
 
 
 /**
+ * 绑定事件
+ * @param  {String} eventname  事件的名称
+ * @param  {Function} handle     事件的处理函数
+ */
+Widget.prototype.on = function(eventname, handle) {
+    var self = this;
+    // 将事件绑定在容器上
+    $(self.container).on(eventname, handle);
+}
+
+/**
  * 注册为 jquery 插件
  * @param  {String} plugname     插件的名字
  * @param  {Function} constructor  插件的构造函数
  */
-Widget.registerJQeuryPlug = function(plugname, constructor) { 
+Widget.registerJQeuryPlug = function(plugname, constructor) {
 
     $.fn[plugname] = function(options) {
         if (options === undefined) {

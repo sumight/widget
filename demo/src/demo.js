@@ -16,6 +16,10 @@ SomeWidget.prototype.init = function(options) {
     var self = this;
     self.initConfig(options);
     self.render(true);
+
+    setTimeout(function(){
+        $(self.container).trigger('bobe', self.name);
+    }, 1000);
 };
 
 SomeWidget.prototype.template = function() {
@@ -62,11 +66,25 @@ SomeWidget.prototype.template = function() {
  */
 Widget.registerJQeuryPlug('bbb', SomeWidget);
 
+/**
+ * 初始化控件
+ */
 $('.js-hook').bbb({
     container:'.js-hook',
     name:'this is name',
     value:'value is here'
 });
+
+/**
+ * 监听事件
+ */
+$('.js-hook').bbb().on('bobe', function(e, arg1){
+    alert('爆炸了 '+arg1);
+})
+
+$('.js-hook.x2').bbb().on('bobe', function(e, arg1){
+    alert('爆炸了 '+arg1);
+})
 
 /**
  * 获取控件的句柄

@@ -11,7 +11,7 @@
 ~ npm i
 
 # 运行 demo
-~ npm demo
+~ npm run demo
 ```
 
 ## 用法

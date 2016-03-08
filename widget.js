@@ -12,7 +12,7 @@ function Widget() {
 }
 
 Widget.prototype.defaultOptions = {
-    
+
 };
 
 /**
@@ -94,11 +94,22 @@ Widget.prototype.render = function(replace) {
 
 
 /**
+ * 绑定事件
+ * @param  {String} eventname  事件的名称
+ * @param  {Function} handle     事件的处理函数
+ */
+Widget.prototype.on = function(eventname, handle) {
+    var self = this;
+    // 将事件绑定在容器上
+    $(self.container).on(eventname, handle);
+}
+
+/**
  * 注册为 jquery 插件
  * @param  {String} plugname     插件的名字
  * @param  {Function} constructor  插件的构造函数
  */
-Widget.registerJQeuryPlug = function(plugname, constructor) { 
+Widget.registerJQeuryPlug = function(plugname, constructor) {
 
     $.fn[plugname] = function(options) {
         if (options === undefined) {
