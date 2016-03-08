@@ -9,7 +9,8 @@ util.inherits(SomeWidget, Widget);
 
 SomeWidget.prototype.defaultOptions = {
     name: '',
-    value: ''
+    value: '',
+    age: '100'
 };
 
 SomeWidget.prototype.init = function(options) {
@@ -24,7 +25,7 @@ SomeWidget.prototype.init = function(options) {
 
 SomeWidget.prototype.template = function() {
     var self = this;
-    return '<span class="btn">' + self.name + '   ' + self.value + '</span>';
+    return '<span class="btn">' + self.name + '   ' + self.value + '  '+ self.age +'</span>';
 };
 
 // 使用控件
@@ -67,6 +68,11 @@ SomeWidget.prototype.template = function() {
 Widget.registerJQeuryPlug('bbb', SomeWidget);
 
 /**
+ * 对控件类进行扩展
+ */
+$.extend($.bbb.prototype.defaultOptions, {age:0});
+
+/**
  * 初始化控件
  */
 $('.js-hook').bbb({
@@ -79,11 +85,11 @@ $('.js-hook').bbb({
  * 监听事件
  */
 $('.js-hook').bbb().on('bobe', function(e, arg1){
-    alert('爆炸了 '+arg1);
+    console.log('爆炸了 '+arg1);
 })
 
 $('.js-hook.x2').bbb().on('bobe', function(e, arg1){
-    alert('爆炸了 '+arg1);
+    console.log('爆炸了 '+arg1);
 })
 
 /**
