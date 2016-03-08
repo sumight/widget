@@ -1,5 +1,5 @@
 /**
- * [description]
+ * 控件的抽象类，写控件的时候可以继承此类来减少操作
  * @module widget
  * @author xjc
  */
@@ -103,15 +103,6 @@ Widget.prototype.on = function(eventname, handle) {
     // 将事件绑定在容器上
     $(self.container).on(eventname, handle);
 }
-
-/**
- * 设置默认的选项
- * @param {Object}  options 用户选项
- */
-Widget.prototype.setDefaultOptions = function(options) {
-    var self = this;
-    $.extend(self.prototype.defaultOptions, options);
-};
 
 /**
  * 注册为 jquery 插件
