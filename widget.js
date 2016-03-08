@@ -110,7 +110,6 @@ Widget.prototype.on = function(eventname, handle) {
  * @param  {Function} constructor  插件的构造函数
  */
 Widget.registerJQeuryPlug = function(plugname, constructor) {
-    debugger;
     // 将类暴露到 jQuery 变量下便于扩展
     jQuery[plugname] = constructor;
 
