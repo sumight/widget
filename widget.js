@@ -19,10 +19,15 @@ Widget.prototype.defaultOptions = {
  * 初始化配置
  * @param  {Object} options 用户选项
  */
-Widget.prototype.initConfig = function(options) {
+Widget.prototype.initConfig = function(options, deep) {
     var self = this;
     // 获取初始化时候的配置
-    util.extend(self, self.defaultOptions, options);
+    if(deep){
+        util.extend(true, self, self.defaultOptions, options);
+    }else{
+        util.extend(self, self.defaultOptions, options);
+    }
+    
     // 获取容器
     self.$container = $(self.container).eq(0);
     // 获取钩子上的配置
@@ -59,7 +64,6 @@ Widget.prototype.render = function(replace) {
         return;
     }
     if (template === '') {
-        throw new Error('can not find template!');
         return;
     }
     // 生成 dom

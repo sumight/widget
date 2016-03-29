@@ -7,6 +7,10 @@ var SomeWidget = function() {
 
 util.inherits(SomeWidget, Widget);
 
+SomeWidget.prototype = new Widget();
+
+
+
 SomeWidget.prototype.defaultOptions = {
     name: '',
     value: '',

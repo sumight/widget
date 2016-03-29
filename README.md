@@ -14,7 +14,25 @@
 ~ npm run demo
 ```
 
-## 用法
+## 属性
+
+### widget.prototype.$content
+
+jquery 对象
+
+控件的内容，也就是模板提供之后的生成的内容
+
+在调用 initConfig 之后可以使用
+
+### widget.prototype.$container
+
+jquery 对象
+
+容器，也就是 container 指定的对象
+
+在调用 render 方法之后可以使用
+
+## 方法
 
 详见 demo
 
