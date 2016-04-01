@@ -22,7 +22,7 @@ SomeWidget.prototype.defaultOptions = {
 
 SomeWidget.prototype.init = function(options) {
     var self = this;
-    self.initConfig(options);
+    self.initConfig(options, true);
     self.render(true);
 
     setTimeout(function(){
@@ -85,7 +85,7 @@ $.extend($.bbb.prototype.defaultOptions, {age:0});
 $('.js-hook').bbb({
     container:'.js-hook',
     name:'this is name',
-    value:'value is here'
+    value:'value is here 1111'
 });
 
 /**

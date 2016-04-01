@@ -359,7 +359,6 @@ extend(util, sutil);
 
 // 对传统模块化方法的支持
 if(!!window.util){throw new Error('全局变量冲突，util')}else{window.util = module.exports}
-
 },{"extend":6,"util":5}],2:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module

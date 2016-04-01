@@ -23,7 +23,7 @@ SomeWidget.prototype.defaultOptions = {
 
 SomeWidget.prototype.init = function(options) {
     var self = this;
-    self.initConfig(options);
+    self.initConfig(options, true);
     self.render(true);
 
     setTimeout(function(){
@@ -86,7 +86,7 @@ $.extend($.bbb.prototype.defaultOptions, {age:0});
 $('.js-hook').bbb({
     container:'.js-hook',
     name:'this is name',
-    value:'value is here'
+    value:'value is here 1111'
 });
 
 /**
@@ -469,7 +469,6 @@ extend(util, sutil);
 
 // 对传统模块化方法的支持
 /* @support tradition plugname(util) */
-
 },{"extend":7,"util":6}],3:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
