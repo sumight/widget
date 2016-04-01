@@ -22,26 +22,45 @@ Widget.prototype.defaultOptions = {
 Widget.prototype.initConfig = function(options, deep) {
     var self = this;
     // 获取初始化时候的配置
+    var halfOptions;
     if(deep){
-        util.extend(true, self, self.defaultOptions, options);
+        halfOptions = util.extend(true, {}, self.defaultOptions, options);
     }else{
-        util.extend(self, self.defaultOptions, options);
+        halfOptions = util.extend({}, self.defaultOptions, options);
     }
-    
+    // 获取标签上的 Options
+    util.traverseLeafWithPath(self.defaultOptions, function(value, path){
+        // 标签上的选项的名字
+        var tagOptionName = self.getTagOptionNameBy(path);
+        // 标签上选项的值
+        var tagOptionValue = $(halfOptions.container).attr(tagOptionName);
+        // 如果标签 value 值不为空，则覆盖当前的选项
+        if(!util.isEmpty(tagOptionValue)){
+            util.visit(halfOptions, path, tagOptionValue);
+        }
+    });
+    // 最终合体
+    util.extend(self, halfOptions);
+
     // 获取容器
     self.$container = $(self.container).eq(0);
-    // 获取钩子上的配置
-    for (var key in self.defaultOptions) {
-        // 内联配置的值
-        var value = self.$container.attr(key);
-        // 如果 value 不为空
-        if (!util.isEmpty(value)) {
-            // 添加到选项中
-            self[key] = value;
-        }
-    }
-
 };
+
+/**
+ * 通过 option name 获取 tag 上的 option name
+ *     两者的格式不同，映射关系如下，
+ *         dataSource.utl ---> data-source--util
+ * @param  {[type]} optionName [description]
+ * @return {[type]}            [description]
+ */
+Widget.prototype.getTagOptionNameBy = function(optionName){
+    var tagOptionName = optionName;
+    return tagOptionName
+        .replace(/\./g, '--')
+        .replace(/([A-Z])/g, function($$,$1){
+            return '-'+$1.toLowerCase();
+        });
+}
 
 /**
  * 根据模板对控件进行渲染
@@ -77,14 +96,7 @@ Widget.prototype.render = function(replace) {
             throw new Error('if replace, template content element can not more then one!')
             return;
         }
-        // 将容器元素中的id 和 class 复制到 内容元素中
-        // var id = self.$container.attr('id');
-        // var className = self.$container.attr('class');
-        // self.$content
-        //     .attr('id',id)
-        //     .addClass(className);
-        // 替换容器元素为内容元素
-        // self.$container.replaceWith(self.$content);
+        // 偷梁换柱
         self.$container.hide();
         self.$container.after(self.$content);
     } else {

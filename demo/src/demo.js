@@ -14,7 +14,10 @@ SomeWidget.prototype = new Widget();
 SomeWidget.prototype.defaultOptions = {
     name: '',
     value: '',
-    age: '100'
+    age: '100',
+    dataSource:{
+        url:'this is url default'
+    }
 };
 
 SomeWidget.prototype.init = function(options) {
@@ -29,7 +32,7 @@ SomeWidget.prototype.init = function(options) {
 
 SomeWidget.prototype.template = function() {
     var self = this;
-    return '<span class="btn">' + self.name + '   ' + self.value + '  '+ self.age +'</span>';
+    return '<div><span class="btn">' + self.name + '   ' + self.value + '  '+ self.age + ' ' + self.dataSource.url +'</span></div>';
 };
 
 // 使用控件

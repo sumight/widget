@@ -22,7 +22,9 @@ jquery 对象
 
 控件的内容，也就是模板提供之后的生成的内容
 
-在调用 initConfig 之后可以使用
+在调用 render 之后可以使用
+
+如果没有提供模板，则 $content 不存在
 
 ### widget.prototype.$container
 
@@ -30,7 +32,7 @@ jquery 对象
 
 容器，也就是 container 指定的对象
 
-在调用 render 方法之后可以使用
+在调用 initConfig 方法之后可以使用
 
 ## 方法
 
@@ -38,7 +40,29 @@ jquery 对象
 
 ### widget.prototype.initConfig
 
-初始化配置，调用这个方法将会读取控件初始化配置时候的用户配置和控件容器中的属性配置，熟悉配置的优先级高于控件用户配置
+初始化配置，调用这个方法将会读取控件初始化配置时候的用户选项和控件容器中的标签选项，标签选项的优先级高于用户配置的用户选项
+
+#### 初始化选项和标签选项的名字的映射关系
+
+```
+dataSource.url --> data-source--url
+```
+
+例子：
+```javascript
+defaultOptions={
+    dataSource{
+        url:'',
+        params:{
+
+        }
+    }
+}
+```
+
+```html
+<div class="js-hook" data-source--url="http://"></div>
+```
 
 #### 参数
 
