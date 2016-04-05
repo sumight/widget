@@ -36,6 +36,10 @@ SomeWidget.prototype.template = function() {
     return '<div><span class="btn">' + self.name + '   ' + self.value + '  '+ self.age + ' ' + self.dataSource.url +'</span></div>';
 };
 
+SomeWidget.prototype.printName = function(){
+    console.log('name', this.name);
+}
+
 // 使用控件
 
 /**
@@ -89,6 +93,7 @@ $('.js-hook').bbb({
     value:'value is here 1111'
 });
 
+
 /**
  * 监听事件
  */
@@ -97,8 +102,10 @@ $('.js-hook').bbb().on('bobe', function(e, arg1){
 })
 
 $('.js-hook.x2').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了 '+arg1);
+    console.log('爆炸了11 '+arg1);
 })
+
+$('.js-hook').bbb().handle().printName();
 
 /**
  * 获取控件的句柄
@@ -108,6 +115,9 @@ console.log($('.js-hook.x1').bbb());
  * 获取控件的另一个句柄
  */
 console.log($('.js-hook.x2').bbb());
+
+Widget.initJQueryPlug();
+$('[name=cry]').bbb().handle().printName();
 },{"../../widget.js":8,"@plug/util":2}],2:[function(require,module,exports){
 /**
  * [description]
@@ -148,7 +158,7 @@ util.traverseLeaf = function(obj, cb) {
     // 如果不是叶子节点，则继续深入遍历
 
     // 如果是数组
-    if (obj.constructor === Array) {
+    if (util.isArray(obj)) {
 
         // 记录元素的父级
         self.traverseLeaf.parent = obj;
@@ -207,7 +217,7 @@ util.traverseLeafWithPath = function(obj, cb, path) {
     // 如果不是叶子节点，则继续深入遍历
 
     // 如果是数组
-    if (obj.constructor === Array) {
+    if (util.isArray(obj)) {
         for (i = 0; i < obj.length; i++) {
             // 计算路径
             var newPath = path;
@@ -281,7 +291,7 @@ util.isLeaf = function(obj) {
         return false;
     }
 
-    if (obj.constructor === Array) {
+    if (util.isArray(obj)) {
         return false;
     }
 
@@ -299,7 +309,9 @@ util.isPlainObject = function(obj) {
     if (typeof obj !== 'object') {
         return false;
     }
-
+    if(obj === null) {
+        return false;
+    }
     if (obj.constructor !== Object) {
         return false;
     }
@@ -1298,19 +1310,19 @@ Widget.prototype.initConfig = function(options, deep) {
     var self = this;
     // 获取初始化时候的配置
     var halfOptions;
-    if(deep){
+    if (deep) {
         halfOptions = util.extend(true, {}, self.defaultOptions, options);
-    }else{
+    } else {
         halfOptions = util.extend({}, self.defaultOptions, options);
     }
     // 获取标签上的 Options
-    util.traverseLeafWithPath(self.defaultOptions, function(value, path){
+    util.traverseLeafWithPath(self.defaultOptions, function(value, path) {
         // 标签上的选项的名字
         var tagOptionName = self.getTagOptionNameBy(path);
         // 标签上选项的值
         var tagOptionValue = $(halfOptions.container).attr(tagOptionName);
         // 如果标签 value 值不为空，则覆盖当前的选项
-        if(!util.isEmpty(tagOptionValue)){
+        if (!util.isEmpty(tagOptionValue)) {
             util.visit(halfOptions, path, tagOptionValue);
         }
     });
@@ -1328,12 +1340,12 @@ Widget.prototype.initConfig = function(options, deep) {
  * @param  {[type]} optionName [description]
  * @return {[type]}            [description]
  */
-Widget.prototype.getTagOptionNameBy = function(optionName){
+Widget.prototype.getTagOptionNameBy = function(optionName) {
     var tagOptionName = optionName;
     return tagOptionName
         .replace(/\./g, '--')
-        .replace(/([A-Z])/g, function($$,$1){
-            return '-'+$1.toLowerCase();
+        .replace(/([A-Z])/g, function($$, $1) {
+            return '-' + $1.toLowerCase();
         });
 }
 
@@ -1407,7 +1419,7 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
     $.fn[plugname] = function(options) {
         if (options === undefined) {
             // 如果存在句柄，则返回
-            return $(this).data('handle');
+            return this;
         }
 
         // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
@@ -1420,9 +1432,42 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
             options.container = $this;
             someWidget.init(options);
             // 保存句柄
-            $this.data('handle', someWidget);
+            $this.data('handle-' + plugname, someWidget);
         });
+    };
+
+    $.fn.handle = function() {
+        var self = this;
+        // handle 对象
+        var handle = {};
+        // 获取组件中的方法，添加到新的 handle 对象中
+        for (var key in constructor.prototype) {
+            if (util.isFunction(constructor.prototype[key])) {
+                (function(methodName) {
+                    handle[methodName] = function() {
+                        var outArguments = arguments;
+                        self.each(function() {
+                            var onehandle = $(this).data('handle-' + plugname);
+                            onehandle[methodName].apply(onehandle, outArguments);
+                        });
+                    }
+                })(key);
+            }
+        }
+        return handle;
     }
+};
+
+/**
+ * 初始化所有的 jquery 插件
+ * @return {[type]} [description]
+ */
+Widget.initJQueryPlug = function(){
+    $('[widget]').each(function(){
+        var $this = $(this);
+        var widgetName = $this.attr('widget');
+        $this[widgetName]({});
+    });
 };
 
 /**

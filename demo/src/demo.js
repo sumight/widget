@@ -35,6 +35,10 @@ SomeWidget.prototype.template = function() {
     return '<div><span class="btn">' + self.name + '   ' + self.value + '  '+ self.age + ' ' + self.dataSource.url +'</span></div>';
 };
 
+SomeWidget.prototype.printName = function(){
+    console.log('name', this.name);
+}
+
 // 使用控件
 
 /**
@@ -88,6 +92,7 @@ $('.js-hook').bbb({
     value:'value is here 1111'
 });
 
+
 /**
  * 监听事件
  */
@@ -96,8 +101,10 @@ $('.js-hook').bbb().on('bobe', function(e, arg1){
 })
 
 $('.js-hook.x2').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了 '+arg1);
+    console.log('爆炸了11 '+arg1);
 })
+
+$('.js-hook').bbb().handle().printName();
 
 /**
  * 获取控件的句柄
@@ -107,3 +114,6 @@ console.log($('.js-hook.x1').bbb());
  * 获取控件的另一个句柄
  */
 console.log($('.js-hook.x2').bbb());
+
+Widget.initJQueryPlug();
+$('[name=cry]').bbb().handle().printName();
