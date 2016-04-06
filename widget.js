@@ -36,6 +36,13 @@ Widget.prototype.initConfig = function(options, deep) {
         var tagOptionValue = $(halfOptions.container).attr(tagOptionName);
         // 如果标签 value 值不为空，则覆盖当前的选项
         if (!util.isEmpty(tagOptionValue)) {
+            //  解析 boolean 值
+            if (tagOptionValue === 'false') {
+                tagOptionValue = false;
+            }
+            if (tagOptionValue === 'true') {
+                tagOptionValue = true;
+            }
             util.visit(halfOptions, path, tagOptionValue);
         }
     });
@@ -130,41 +137,50 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
     jQuery[plugname] = constructor;
 
     $.fn[plugname] = function(options) {
-        if (options === undefined) {
-            // 如果存在句柄，则返回
-            return this;
-        }
+
+        // if (options === undefined) {
+        //     // 如果存在句柄，则返回
+        //     this.data('widget-handle', someWidget);
+        //     return this;
+        // }
 
         // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
         return this.each(function() {
             var $this = $(this);
-
-            // 实例化控件
-            var someWidget = new constructor();
-            // 初始化控件
-            options.container = $this;
-            someWidget.init(options);
-            // 保存句柄
-            $this.data('handle-' + plugname, someWidget);
+            var someWidget;
+            if (options === undefined) {
+                $this.data('widget-handle', someWidget);
+            } else {
+                // 实例化控件
+                someWidget = new constructor();
+                // 初始化控件
+                options.container = $this;
+                someWidget.init(options);
+                // 保存句柄
+                $this.data('widget-handle', someWidget);
+            }
         });
     };
 
     $.fn.handle = function() {
+        // todo 这里还有问题，获取 handle 的时候，
+        // 然后历史的插件。 on 事件需要修改
         var self = this;
         // handle 对象
         var handle = {};
+        var onehandle = $(this).data('widget-handle');
         // 获取组件中的方法，添加到新的 handle 对象中
-        for (var key in constructor.prototype) {
-            if (util.isFunction(constructor.prototype[key])) {
-                (function(methodName) {
+        for (var key in onehandle) {
+            if (util.isFunction(onehandle[key])) {
+                (function(methodName, plugname, onehandle) {
                     handle[methodName] = function() {
                         var outArguments = arguments;
                         self.each(function() {
-                            var onehandle = $(this).data('handle-' + plugname);
+
                             onehandle[methodName].apply(onehandle, outArguments);
                         });
                     }
-                })(key);
+                })(key, plugname, onehandle);
             }
         }
         return handle;
@@ -175,10 +191,14 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
  * 初始化所有的 jquery 插件
  * @return {[type]} [description]
  */
-Widget.initJQueryPlug = function(){
-    $('[widget]').each(function(){
+Widget.initJQueryPlug = function() {
+    $('[widget]').each(function() {
         var $this = $(this);
         var widgetName = $this.attr('widget');
+        // 将中划线语法换算成驼峰命名法
+        widgetName = widgetName.replace(/\-([a-z])/g, function($$, $1) {
+            return $1.toUpperCase();
+        });
         $this[widgetName]({});
     });
 };
