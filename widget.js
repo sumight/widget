@@ -138,68 +138,79 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
 
     $.fn[plugname] = function(options) {
 
-        // if (options === undefined) {
-        //     // 如果存在句柄，则返回
-        //     this.data('widget-handle', someWidget);
-        //     return this;
-        // }
-
-        // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
-        return this.each(function() {
-            var $this = $(this);
-            var someWidget;
-            if (options === undefined) {
-                $this.data('widget-handle', someWidget);
-            } else {
+        if (options === undefined) {
+            // 如果没有选项，则返回所有已经初始化为插件的对象
+            var $plugs = this.filter(function() {
+                // 返回已经被初始化为插件的元素
+                var handle = $(this).data('widget-handle-'+plugname);
+                if(!!handle){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+            // 返回句柄对象
+            return handleWraper($plugs, plugname);
+        } else {
+            // 如果没有选项，则将选择器中的所有内容进行插件初始化，并且全部返回
+            var $plugs = this.each(function() {
+                var $this = $(this);
                 // 实例化控件
-                someWidget = new constructor();
+                var someWidget = new constructor();
                 // 初始化控件
                 options.container = $this;
                 someWidget.init(options);
                 // 保存句柄
-                $this.data('widget-handle', someWidget);
-            }
-        });
-    };
-
-    $.fn.handle = function() {
-        // todo 这里还有问题，获取 handle 的时候，
-        // 然后历史的插件。 on 事件需要修改
-        var self = this;
-        // handle 对象
-        var handle = {};
-        var onehandle = $(this).data('widget-handle');
-        // 获取组件中的方法，添加到新的 handle 对象中
-        for (var key in onehandle) {
-            if (util.isFunction(onehandle[key])) {
-                (function(methodName, plugname, onehandle) {
-                    handle[methodName] = function() {
-                        var outArguments = arguments;
-                        self.each(function() {
-                            var handle = $(this).data('widget-handle');
-                            onehandle[methodName].apply(handle, outArguments);
-                        });
-                    }
-                })(key, plugname, onehandle);
-            }
+                $this.data('widget-handle-' + plugname, someWidget);
+            });
+            // 返回句柄对象
+            return handleWraper($plugs, plugname);
         }
-        return handle;
-    }
+    };
 };
 
 /**
- * 初始化所有的 jquery 插件
+ * 返回 jquery 插件的操作对象
  * @return {[type]} [description]
  */
+function handleWraper($plugs, plugname) {
+    var onehandle = jQuery[plugname].prototype;
+    var handle = {};
+    // 获取组件中的方法，添加到新的 handle 对象中
+    for (var key in onehandle) {
+        if (util.isFunction(onehandle[key])) {
+            (function() {
+                var methodName = key;
+                // 将方法添加到 handle
+                handle[methodName] = function() {
+                    var outArguments = arguments;
+                    $plugs.each(function() {
+                        var handle = $(this).data('widget-handle-' + plugname);
+                        if (!!handle) {
+                            onehandle[methodName].apply(handle, outArguments);
+                        }
+                    });
+                }
+            })();
+
+        }
+    }
+    return handle;
+}
+
 Widget.initJQueryPlug = function() {
     $('[widget]').each(function() {
         var $this = $(this);
-        var widgetName = $this.attr('widget');
-        // 将中划线语法换算成驼峰命名法
-        widgetName = widgetName.replace(/\-([a-z])/g, function($$, $1) {
-            return $1.toUpperCase();
+        var widgetNames = $this.attr('widget');
+        //  对 widget属性指定的多个控件进行初始化
+        widgetNames = widgetNames.split(',');
+        widgetNames.forEach(function(widgetName) {
+            // 将中划线语法换算成驼峰命名法
+            widgetName = widgetName.replace(/\-([a-z])/g, function($$, $1) {
+                return $1.toUpperCase();
+            });
+            $this[widgetName]({});
         });
-        $this[widgetName]({});
     });
 };
 

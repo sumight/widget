@@ -2,122 +2,107 @@
 var Widget = require('../../widget.js');
 var util = require('@plug/util');
 
-var SomeWidget = function() {
+// bbb 插件
+(function() {
+    var SomeWidget = function() {
 
-}
-
-util.inherits(SomeWidget, Widget);
-
-SomeWidget.prototype = new Widget();
-
-
-
-SomeWidget.prototype.defaultOptions = {
-    name: '',
-    value: '',
-    age: '100',
-    dataSource:{
-        url:'this is url default'
     }
-};
+    util.inherits(SomeWidget, Widget);
 
-SomeWidget.prototype.init = function(options) {
-    var self = this;
-    self.initConfig(options, true);
-    self.render(true);
+    SomeWidget.prototype.defaultOptions = {
+        name: '',
+        value: '',
+        age: '100',
+        dataSource: {
+            url: 'this is url default'
+        }
+    };
 
-    setTimeout(function(){
-        $(self.container).trigger('bobe', self.name);
-    }, 1000);
-};
+    SomeWidget.prototype.init = function(options) {
+        var self = this;
+        self.initConfig(options, true);
+        self.render(true);
 
-SomeWidget.prototype.template = function() {
-    var self = this;
-    return '<div><span class="btn">' + self.name + '   ' + self.value + '  '+ self.age + ' ' + self.dataSource.url +'</span></div>';
-};
+        setTimeout(function() {
+            $(self.container).trigger('bobe', self.name);
+        }, 1000);
+    };
 
-SomeWidget.prototype.printName = function(){
-    console.log('name', this.name);
-}
+    SomeWidget.prototype.template = function() {
+        var self = this;
+        return '<div><span class="btn">' + self.name + '   ' + self.value + '  ' + self.age + ' ' + self.dataSource.url + '</span></div>';
+    };
 
-// 使用控件
+    SomeWidget.prototype.printName = function() {
+        console.log('name', this.name);
+    }
 
-/**
- * 直接单例初始化
- */
-// var w = new SomeWidget();
-// w.init({
-//     container:'.js-hook',
-//     name:'this is name',
-//     value:'value is here'
-// });
+    /**
+     * 使用提供的方法注册为 jquery 插件
+     */
+    Widget.registerJQeuryPlug('bbb', SomeWidget);
 
-/**
- * 手动注册为 jquery plug
- */
-// $.fn.SomeWidget = function(options) {
-//     if (options === undefined) {
-//         // 如果存在句柄，则返回
-//         return $(this).data('handle');
-//     }
-//     // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
-//     return this.each(function() {
-//         var $this = $(this);
+})();
 
-//         // 实例化控件
-//         var someWidget = new SomeWidget();
-//         // 初始化控件
-//         options.container = $this;
-//         someWidget.init(options);
-//         // 保存句柄
-//         $this.data('handle', someWidget);
-//     });
-// }
+// xxx 插件
+(function() {
+    var SomeWidget = function() {
 
-/**
- * 使用提供的方法注册为 jquery 插件
- */
-Widget.registerJQeuryPlug('bbb', SomeWidget);
+    }
+    util.inherits(SomeWidget, Widget);
+
+    SomeWidget.prototype.defaultOptions = {
+        validate: 'a good validate'
+    };
+
+    SomeWidget.prototype.init = function(options) {
+        var self = this;
+        self.initConfig(options, true);
+        console.log('初始化xxx');
+    };
+
+    SomeWidget.prototype.printValidate = function() {
+        console.log('validate', this.validate);
+    }
+
+    /**
+     * 使用提供的方法注册为 jquery 插件
+     */
+    Widget.registerJQeuryPlug('xxx', SomeWidget);
+
+})();
 
 /**
  * 对控件类进行扩展
  */
-$.extend($.bbb.prototype.defaultOptions, {age:0});
+// $.extend($.bbb.prototype.defaultOptions, { age: 0 });
 
 /**
  * 初始化控件
  */
-$('.js-hook').bbb({
-    container:'.js-hook',
-    name:'this is name',
-    value:'value is here 1111'
-});
-
-
-/**
- * 监听事件
- */
-$('.js-hook').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了 '+arg1);
-})
-
-$('.js-hook.x2').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了11 '+arg1);
-})
-
-$('.js-hook').bbb().handle().printName();
+// $('.js-hook').bbb({
+//     container: '.js-hook',
+//     name: 'this is name',
+//     value: 'value is here 1111'
+// });
+// $('.js-hook').bbb().handle().printName();
 
 /**
  * 获取控件的句柄
  */
-console.log($('.js-hook.x1').bbb());
+// console.log($('.js-hook.x1').handle().bbb());
+
 /**
  * 获取控件的另一个句柄
  */
-console.log($('.js-hook.x2').bbb());
+// console.log($('.js-hook.x2').handle().bbb());
+
 
 Widget.initJQueryPlug();
-$('[name=cry]').bbb().handle().printName();
+
+$('.container').children().bbb().printName();
+
+$('.container').children().xxx().printValidate();
 },{"../../widget.js":8,"@plug/util":2}],2:[function(require,module,exports){
 /**
  * [description]
@@ -1323,6 +1308,13 @@ Widget.prototype.initConfig = function(options, deep) {
         var tagOptionValue = $(halfOptions.container).attr(tagOptionName);
         // 如果标签 value 值不为空，则覆盖当前的选项
         if (!util.isEmpty(tagOptionValue)) {
+            //  解析 boolean 值
+            if (tagOptionValue === 'false') {
+                tagOptionValue = false;
+            }
+            if (tagOptionValue === 'true') {
+                tagOptionValue = true;
+            }
             util.visit(halfOptions, path, tagOptionValue);
         }
     });
@@ -1417,56 +1409,80 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
     jQuery[plugname] = constructor;
 
     $.fn[plugname] = function(options) {
+
         if (options === undefined) {
-            // 如果存在句柄，则返回
-            return this;
+            // 如果没有选项，则返回所有已经初始化为插件的对象
+            var $plugs = this.filter(function() {
+                // 返回已经被初始化为插件的元素
+                var handle = $(this).data('widget-handle-'+plugname);
+                if(!!handle){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+            // 返回句柄对象
+            return handleWraper($plugs, plugname);
+        } else {
+            // 如果没有选项，则将选择器中的所有内容进行插件初始化，并且全部返回
+            var $plugs = this.each(function() {
+                var $this = $(this);
+                // 实例化控件
+                var someWidget = new constructor();
+                // 初始化控件
+                options.container = $this;
+                someWidget.init(options);
+                // 保存句柄
+                $this.data('widget-handle-' + plugname, someWidget);
+            });
+            // 返回句柄对象
+            return handleWraper($plugs, plugname);
         }
-
-        // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
-        return this.each(function() {
-            var $this = $(this);
-
-            // 实例化控件
-            var someWidget = new constructor();
-            // 初始化控件
-            options.container = $this;
-            someWidget.init(options);
-            // 保存句柄
-            $this.data('handle-' + plugname, someWidget);
-        });
     };
-
-    $.fn.handle = function() {
-        var self = this;
-        // handle 对象
-        var handle = {};
-        // 获取组件中的方法，添加到新的 handle 对象中
-        for (var key in constructor.prototype) {
-            if (util.isFunction(constructor.prototype[key])) {
-                (function(methodName) {
-                    handle[methodName] = function() {
-                        var outArguments = arguments;
-                        self.each(function() {
-                            var onehandle = $(this).data('handle-' + plugname);
-                            onehandle[methodName].apply(onehandle, outArguments);
-                        });
-                    }
-                })(key);
-            }
-        }
-        return handle;
-    }
 };
 
 /**
- * 初始化所有的 jquery 插件
+ * 返回 jquery 插件的操作对象
  * @return {[type]} [description]
  */
-Widget.initJQueryPlug = function(){
-    $('[widget]').each(function(){
+function handleWraper($plugs, plugname) {
+    var onehandle = jQuery[plugname].prototype;
+    var handle = {};
+    // 获取组件中的方法，添加到新的 handle 对象中
+    for (var key in onehandle) {
+        if (util.isFunction(onehandle[key])) {
+            (function() {
+                var methodName = key;
+                // 将方法添加到 handle
+                handle[methodName] = function() {
+                    var outArguments = arguments;
+                    $plugs.each(function() {
+                        var handle = $(this).data('widget-handle-' + plugname);
+                        if (!!handle) {
+                            onehandle[methodName].apply(handle, outArguments);
+                        }
+                    });
+                }
+            })();
+
+        }
+    }
+    return handle;
+}
+
+Widget.initJQueryPlug = function() {
+    $('[widget]').each(function() {
         var $this = $(this);
-        var widgetName = $this.attr('widget');
-        $this[widgetName]({});
+        var widgetNames = $this.attr('widget');
+        //  对 widget属性指定的多个控件进行初始化
+        widgetNames = widgetNames.split(',');
+        widgetNames.forEach(function(widgetName) {
+            // 将中划线语法换算成驼峰命名法
+            widgetName = widgetName.replace(/\-([a-z])/g, function($$, $1) {
+                return $1.toUpperCase();
+            });
+            $this[widgetName]({});
+        });
     });
 };
 

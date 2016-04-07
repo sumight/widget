@@ -1,119 +1,104 @@
 var Widget = require('../../widget.js');
 var util = require('@plug/util');
 
-var SomeWidget = function() {
+// bbb 插件
+(function() {
+    var SomeWidget = function() {
 
-}
-
-util.inherits(SomeWidget, Widget);
-
-SomeWidget.prototype = new Widget();
-
-
-
-SomeWidget.prototype.defaultOptions = {
-    name: '',
-    value: '',
-    age: '100',
-    dataSource:{
-        url:'this is url default'
     }
-};
+    util.inherits(SomeWidget, Widget);
 
-SomeWidget.prototype.init = function(options) {
-    var self = this;
-    self.initConfig(options, true);
-    self.render(true);
+    SomeWidget.prototype.defaultOptions = {
+        name: '',
+        value: '',
+        age: '100',
+        dataSource: {
+            url: 'this is url default'
+        }
+    };
 
-    setTimeout(function(){
-        $(self.container).trigger('bobe', self.name);
-    }, 1000);
-};
+    SomeWidget.prototype.init = function(options) {
+        var self = this;
+        self.initConfig(options, true);
+        self.render(true);
 
-SomeWidget.prototype.template = function() {
-    var self = this;
-    return '<div><span class="btn">' + self.name + '   ' + self.value + '  '+ self.age + ' ' + self.dataSource.url +'</span></div>';
-};
+        setTimeout(function() {
+            $(self.container).trigger('bobe', self.name);
+        }, 1000);
+    };
 
-SomeWidget.prototype.printName = function(){
-    console.log('name', this.name);
-}
+    SomeWidget.prototype.template = function() {
+        var self = this;
+        return '<div><span class="btn">' + self.name + '   ' + self.value + '  ' + self.age + ' ' + self.dataSource.url + '</span></div>';
+    };
 
-// 使用控件
+    SomeWidget.prototype.printName = function() {
+        console.log('name', this.name);
+    }
 
-/**
- * 直接单例初始化
- */
-// var w = new SomeWidget();
-// w.init({
-//     container:'.js-hook',
-//     name:'this is name',
-//     value:'value is here'
-// });
+    /**
+     * 使用提供的方法注册为 jquery 插件
+     */
+    Widget.registerJQeuryPlug('bbb', SomeWidget);
 
-/**
- * 手动注册为 jquery plug
- */
-// $.fn.SomeWidget = function(options) {
-//     if (options === undefined) {
-//         // 如果存在句柄，则返回
-//         return $(this).data('handle');
-//     }
-//     // 在 Options 存在的情况下,初始化控件，并返回自己，以供链式调用，并且保存 handle
-//     return this.each(function() {
-//         var $this = $(this);
+})();
 
-//         // 实例化控件
-//         var someWidget = new SomeWidget();
-//         // 初始化控件
-//         options.container = $this;
-//         someWidget.init(options);
-//         // 保存句柄
-//         $this.data('handle', someWidget);
-//     });
-// }
+// xxx 插件
+(function() {
+    var SomeWidget = function() {
 
-/**
- * 使用提供的方法注册为 jquery 插件
- */
-Widget.registerJQeuryPlug('bbb', SomeWidget);
+    }
+    util.inherits(SomeWidget, Widget);
+
+    SomeWidget.prototype.defaultOptions = {
+        validate: 'a good validate'
+    };
+
+    SomeWidget.prototype.init = function(options) {
+        var self = this;
+        self.initConfig(options, true);
+        console.log('初始化xxx');
+    };
+
+    SomeWidget.prototype.printValidate = function() {
+        console.log('validate', this.validate);
+    }
+
+    /**
+     * 使用提供的方法注册为 jquery 插件
+     */
+    Widget.registerJQeuryPlug('xxx', SomeWidget);
+
+})();
 
 /**
  * 对控件类进行扩展
  */
-$.extend($.bbb.prototype.defaultOptions, {age:0});
+// $.extend($.bbb.prototype.defaultOptions, { age: 0 });
 
 /**
  * 初始化控件
  */
-$('.js-hook').bbb({
-    container:'.js-hook',
-    name:'this is name',
-    value:'value is here 1111'
-});
-
-
-/**
- * 监听事件
- */
-$('.js-hook').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了 '+arg1);
-})
-
-$('.js-hook.x2').bbb().on('bobe', function(e, arg1){
-    console.log('爆炸了11 '+arg1);
-})
-
-$('.js-hook').bbb().handle().printName();
+// $('.js-hook').bbb({
+//     container: '.js-hook',
+//     name: 'this is name',
+//     value: 'value is here 1111'
+// });
+// $('.js-hook').bbb().handle().printName();
 
 /**
  * 获取控件的句柄
  */
-console.log($('.js-hook.x1').bbb());
+// console.log($('.js-hook.x1').handle().bbb());
+
 /**
  * 获取控件的另一个句柄
  */
-console.log($('.js-hook.x2').bbb());
+// console.log($('.js-hook.x2').handle().bbb());
+
 
 Widget.initJQueryPlug();
-$('[name=cry]').bbb().handle().printName();
+
+$('.container').children().bbb().printName();
+
+$('.container').children().xxx().printValidate();
