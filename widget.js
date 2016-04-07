@@ -176,8 +176,8 @@ Widget.registerJQeuryPlug = function(plugname, constructor) {
                     handle[methodName] = function() {
                         var outArguments = arguments;
                         self.each(function() {
-
-                            onehandle[methodName].apply(onehandle, outArguments);
+                            var handle = $(this).data('widget-handle');
+                            onehandle[methodName].apply(handle, outArguments);
                         });
                     }
                 })(key, plugname, onehandle);
