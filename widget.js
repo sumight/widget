@@ -198,8 +198,14 @@ function handleWraper($plugs, plugname) {
     return handle;
 }
 
-Widget.initJQueryPlug = function() {
-    $('[widget]').each(function() {
+Widget.initJQueryPlug = function($context) {
+    var $widget;
+    if($context){
+        $widget = $context.find('[widget]');
+    }else{
+        $widget = $('[widget]');
+    }
+    $widget.each(function() {
         var $this = $(this);
         var widgetNames = $this.attr('widget');
         //  对 widget属性指定的多个控件进行初始化
