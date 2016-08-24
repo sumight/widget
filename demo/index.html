@@ -7,13 +7,25 @@
 </head>
 <body>
     <h1>Demo</h1>
-    <div id="sayer"></div>
+
+    <!-- 基本用法 -->
+    <div id="sayer-v1"></div>
+    <br>
+
+    <!-- 在标签中配置选项 -->
+    <div id="sayer-v2" name="night"></div>
+
     <script type="text/javascript">
-        jQuery(function($){
-            $('#sayer').sayer({
-                name:'summer'
-            });
+    jQuery(function($){
+
+        $('#sayer-v1').sayer({
+            name:'summer'
         });
+
+        $('#sayer-v2').sayer({
+        });
+        
+    });
     </script>
 </body>
 </html>
